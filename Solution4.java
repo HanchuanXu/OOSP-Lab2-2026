@@ -23,41 +23,42 @@ import java.util.Arrays;
  *
  * 提示:
  *
- * 1 <= nums.length <= 105
- * 0 <= nums[i] <= 109
+ * 1 <= nums.length <= 10^5
+ * 0 <= nums[i] <= 10^9
  *
  */
 class Solution4 {
     public int maximumGap(int[] nums) {
-
-        int n = nums.length - 1;
+        int n = nums.length;
         if (n < 2) {
             return 0;
         }
-        long exp = 1;
-        int[] buf = new int[n];
-        int maxVal = Arrays.stream(nums).max().getAsInt();
 
-        while (maxVal > exp) {
-            int[] cnt = new int[10];
-            for (int i = 0; i < n; i++) {
-                int digit = (nums[i] / (int) exp) % 10;
-                cnt[digit]++;
+        int maxVal = Arrays.stream(nums).max().getAsInt();
+        int[] buf = new int[n];
+
+        // 从个位到最高位进行稳定计数排序。
+        for (long exp = 1; exp <= maxVal; exp *= 10) {
+            int place = (int) exp;
+            int[] counts = new int[10];
+            for (int num : nums) {
+                counts[(num / place) % 10]++;
             }
-            for (int i = 1; i < 10; i++){
-                cnt[i] += cnt[i - 1];
+            for (int digit = 1; digit < counts.length; digit++) {
+                counts[digit] += counts[digit - 1];
+            }
+            // 逆序取元素，保持同一数位的元素在上一轮中的相对顺序。
             for (int i = n - 1; i >= 0; i--) {
-                int digit = (nums[i] / (int) exp) % 10;
-                buf[cnt[digit] - 1] = nums[i];
-                cnt[digit]--;
+                int digit = (nums[i] / place) % 10;
+                buf[--counts[digit]] = nums[i];
             }
             System.arraycopy(buf, 0, nums, 0, n);
-            exp += 10;
         }
 
-        int ret = 0;
-            for (int i = 1; i < n; i++) {
-            ret = Math.max(ret, nums[i] - nums[i - 1]);
-        }return ret;
+        int gap = 0;
+        for (int i = 1; i < n; i++) {
+            gap = Math.max(gap, nums[i] - nums[i - 1]);
+        }
+        return gap;
     }
 }
