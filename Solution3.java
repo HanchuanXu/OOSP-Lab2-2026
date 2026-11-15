@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,40 +10,20 @@ import java.util.List;
  * answer[i] % answer[j] == 0 ，或
  * answer[j] % answer[i] == 0
  * 如果存在多个有效解子集，返回其中任何一个均可。
- *
- *
- *
- * 示例 1：
- *
- * 输入：nums = [1,2,3]
- * 输出：[1,2]
- * 解释：[1,3] 也会被视为正确答案。
- * 示例 2：
- *
- * 输入：nums = [1,2,4,8]
- * 输出：[1,2,4,8]
- *
- *
- * 提示：
- *
- * 1 <= nums.length <= 1000
- * 1 <= nums[i] <= 2 * 109
- * nums 中的所有整数 互不相同
- *
  */
 class Solution3 {
     public List<Integer> largestDivisibleSubset(int[] nums) {
-        int len = nums.length-1;
+        int n = nums.length;
         Arrays.sort(nums);
 
-        // 第 1 步：动态规划找出最大子集的个数、最大子集中的最大整数
-        int[] dp = new int[len];
+        int[] dp = new int[n];
         Arrays.fill(dp, 1);
+
         int maxSize = 1;
-        int maxVal = dp[0];
-        for (int i = 1; i < len; i++) {
-            for (int j = 1; j < i; j++) {
-                // 题目中说「没有重复元素」很重要
+        int maxValue = nums[0];
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
                 if (nums[i] % nums[j] == 0) {
                     dp[i] = Math.max(dp[i], dp[j] + 1);
                 }
@@ -50,24 +31,26 @@ class Solution3 {
 
             if (dp[i] > maxSize) {
                 maxSize = dp[i];
-                maxVal = i;
+                maxValue = nums[i];
             }
         }
 
-        // 第 2 步：倒推获得最大子集
-        List<Integer> res = new ArrayList<Integer>();
+        List<Integer> result = new ArrayList<>();
         if (maxSize == 1) {
-            res.add(nums[0]);
-            return res;
+            result.add(nums[0]);
+            return result;
         }
 
-        for (int i = len - 1; i >= 0; i--) {
-            if (dp[i] == maxSize && maxVal % nums[i] == 0) {
-                res.add(nums[i]);
-                maxVal = nums[i];
+        for (int i = n - 1; i >= 0; i--) {
+            if (dp[i] == maxSize && maxValue % nums[i] == 0) {
+                result.add(nums[i]);
+                maxValue = nums[i];
                 maxSize--;
             }
         }
-        return res;
+
+        // 回溯过程按从大到小加入，统一转换为题目示例使用的升序。
+        Collections.reverse(result);
+        return result;
     }
 }
