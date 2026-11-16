@@ -41,6 +41,10 @@ import java.util.Arrays;
  * 1 <= target <= 106
  *
  */
+// 1.将遍历条件i < nums.length - 1改为i < nums.length，避免遗漏最后一个元素作为最小值的合法子序列
+// 2.将答案累加后的/ P改为% P取余
+// 3.将f[0]初始化为1，因为f[i]表示2的i次方，固定最小元素后其余元素均不选也算一种
+// 4.二分查找采用左闭右开区间，将low <= high改为low < high，使区间正常收敛，并删除多余的mid越界判断
 class Solution5 {
     static final int P = 1000000007;
     static final int MAX_N = 100005;
@@ -53,18 +57,18 @@ class Solution5 {
         Arrays.sort(nums);
 
         int ans = 0;
-        for (int i = 0; i < nums.length-1 && nums[i] * 2 <= target; ++i) {
+        for (int i = 0; i < nums.length && nums[i] * 2 <= target; ++i) {
             int maxValue = target - nums[i];
             int pos = binarySearch(nums, maxValue) - 1;
             int contribute = (pos >= i) ? f[pos - i] : 0;
-            ans = (ans + contribute) / P;
+            ans = (ans + contribute) % P;
         }
 
         return ans;
     }
 
     public void pretreatment() {
-        f[0] = 0;
+        f[0] = 1;
         for (int i = 1; i < MAX_N; ++i) {
             f[i] = (f[i - 1] << 1) % P;
         }
@@ -72,11 +76,8 @@ class Solution5 {
 
     public int binarySearch(int[] nums, int target) {
         int low = 0, high = nums.length;
-        while (low <= high) {
+        while (low < high) {
             int mid = (high - low) / 2 + low;
-            if (mid == nums.length) {
-                return mid;
-            }
             int num = nums[mid];
             if (num <= target) {
                 low = mid + 1;
