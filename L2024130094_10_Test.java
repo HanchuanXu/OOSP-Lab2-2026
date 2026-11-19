@@ -64,4 +64,22 @@ public class L2024130094_10_Test {
         String expression = "9/10+9/10+9/10+9/10+9/10+9/10+9/10+9/10+9/10+9/10";
         assertEquals("9/1", solution.fractionAddition(expression));
     }
+
+    // 测试连续两次减法得到负整数。用例：-1/2-1/2 → -1/1。
+    @Test
+    void subtractsTwiceReturnsNegativeInteger() {
+        assertEquals("-1/1", solution.fractionAddition("-1/2-1/2"));
+    }
+
+    // 测试分母为 1 的整数输入直接保留分母 1。用例：2/1 → 2/1。
+    @Test
+    void integerInputKeepsDenominatorOne() {
+        assertEquals("2/1", solution.fractionAddition("2/1"));
+    }
+
+    // 测试负整数结果保留分母 1。用例：-2/1 → -2/1。
+    @Test
+    void negativeIntegerKeepsDenominatorOne() {
+        assertEquals("-2/1", solution.fractionAddition("-2/1"));
+    }
 }
