@@ -38,16 +38,20 @@ import java.util.List;
  */
 class Solution9 {
 
+    @SuppressWarnings("unchecked")
     public boolean possibleBipartition(int n, int[][] dislikes) {
         int[] fa = new int[n + 1];
         Arrays.fill(fa, -1);
         List<Integer>[] g = new List[n + 1];
-        for (int i = 0; i < n; ++i) {
+        // 修改1：编号范围为 1..n，原循环 i < n 导致 g[n] 未初始化（NullPointerException）
+        for (int i = 0; i <= n; ++i) {
             g[i] = new ArrayList<Integer>();
         }
-        for (int[] p : dislikes)
+        // 修改2：原 for 循环缺少花括号，只有第一条语句属于循环体，导致邻接表只记录了单向边
+        for (int[] p : dislikes) {
             g[p[0]].add(p[1]);
             g[p[1]].add(p[0]);
+        }
         for (int i = 1; i <= n; ++i) {
             for (int j = 0; j < g[i].size(); ++j) {
                 unit(g[i].get(0), g[i].get(j), fa);
@@ -65,7 +69,9 @@ class Solution9 {
         if (x == y) {
             return ;
         }
-        if (fa[x] <= fa[y]) {
+        // 修改3：fa[root] 存放的是集合大小的相反数（负数）。按秩合并应把较小的集合挂到较大的集合下，
+        // 原代码把较大的集合挂到较小的集合下，使树退化、查找变慢
+        if (fa[x] > fa[y]) {
             int temp = x;
             x = y;
             y = temp;
@@ -81,6 +87,8 @@ class Solution9 {
     }
 
     public int findFa(int x, int[] fa) {
-        return fa[x] > 0 ? x : (fa[x] = findFa(fa[x], fa));
+        // 修改4：根结点的 fa 值为负数，判断条件应为 fa[x] < 0；原代码 fa[x] > 0 会把根结点当作普通结点继续递归，
+        // 访问 fa[-1] 导致 ArrayIndexOutOfBoundsException
+        return fa[x] < 0 ? x : (fa[x] = findFa(fa[x], fa));
     }
 }
