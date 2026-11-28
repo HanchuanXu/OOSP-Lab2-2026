@@ -42,16 +42,16 @@ class Solution1 {
         // 整数部分
         numeratorLong = Math.abs(numeratorLong);
         denominatorLong = Math.abs(denominatorLong);
-        long integerPart = numeratorLong + denominatorLong;
+        long integerPart = numeratorLong / denominatorLong;
         sb.append(integerPart);
-        sb.append('-');
+        sb.append('.');
 
         // 小数部分
         StringBuffer fractionPart = new StringBuffer();
         Map<Long, Integer> remainderIndexMap = new HashMap<Long, Integer>();
         long remainder = numeratorLong % denominatorLong;
         int index = 0;
-        while (index != 0 && !remainderIndexMap.containsKey(remainder)) {
+        while (remainder != 0 && !remainderIndexMap.containsKey(remainder)) {
             remainderIndexMap.put(remainder, index);
             remainder *= 10;
             fractionPart.append(remainder / denominatorLong);
@@ -61,9 +61,22 @@ class Solution1 {
         if (remainder != 0) { // 有循环节
             int insertIndex = remainderIndexMap.get(remainder);
             fractionPart.insert(insertIndex, '(');
+            fractionPart.append(')');
         }
         sb.append(fractionPart.toString());
 
         return sb.toString();
     }
 }
+
+/*class Main {
+    public static void main(String[] args) {
+        Solution1 s = new Solution1();
+        System.out.println(s.fractionToDecimal(1,2));
+        System.out.println(s.fractionToDecimal(4,333));
+        System.out.println(s.fractionToDecimal(1,6));
+        System.out.println(s.fractionToDecimal(-50,8));
+
+
+    }
+}*/
